@@ -1,0 +1,10 @@
+<button
+  [type]="type()"
+  [class]="
+    'rounded bg-primary px-4 text-xs font-inter py-2 text-white ' +
+    (disabled() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer')
+  "
+  [disabled]="disabled()"
+>
+  <ng-content />
+</button>

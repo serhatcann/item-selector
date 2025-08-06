@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -7,5 +8,7 @@
   --color-border: hsl(210, 0%, 89%);
   --color-primary: hsl(213, 97%, 53%);
 
+  --font-sans: "Source Sans Pro", system-ui, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
   --radius: 3px;
 }

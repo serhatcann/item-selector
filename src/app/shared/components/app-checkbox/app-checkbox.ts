@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Folder } from '../../models/folder.model';
 import { Item } from '../../models/item.model';
@@ -12,7 +12,6 @@ type ToggleEvent = {
   selector: 'app-checkbox',
   imports: [CommonModule],
   templateUrl: './app-checkbox.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppCheckbox {
   @Input() item!: Folder | Item;

@@ -61,8 +61,8 @@ export class ItemSelector implements OnInit {
       this.toggleFolderSelection(this.treeData, event.id);
     } else {
       this.toggleItemSelection(this.treeData, event.id);
+      this.updateParentStates(this.treeData);
     }
-    this.updateParentStates(this.treeData);
     this.cdr.detectChanges();
   }
 

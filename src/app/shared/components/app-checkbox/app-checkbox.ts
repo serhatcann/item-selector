@@ -1,5 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, output } from '@angular/core';
 import { Folder } from '../../models/folder.model';
 import { Item } from '../../models/item.model';
 import { isFolder } from '../../utils/type-guards';
@@ -11,25 +10,42 @@ type ToggleEvent = {
 
 @Component({
   selector: 'app-checkbox',
-  imports: [CommonModule],
   templateUrl: './app-checkbox.html',
 })
 export class AppCheckbox {
-  @Input() item!: Folder | Item;
-  @Input() level = 0;
-  @Output() toggleExpanded = new EventEmitter<number>();
-  @Output() toggleSelected = new EventEmitter<ToggleEvent>();
+  item = input.required<Folder | Item>();
+  level = input(0);
+
+  toggleExpanded = output<number>();
+  toggleSelected = output<ToggleEvent>();
 
   isFolder = isFolder;
 
+  isChecked(): boolean {
+    const item = this.item();
+    return isFolder(item) ? item.selectedState === 'all' : item.selected;
+  }
+
+  isIndeterminate(): boolean {
+    const item = this.item();
+    return isFolder(item) && item.selectedState === 'partial';
+  }
+
+  expandIcon(): string {
+    const item = this.item();
+    return isFolder(item) && item.expanded ? '▲' : '▼';
+  }
+
   onToggleExpanded() {
-    if (isFolder(this.item)) {
-      this.toggleExpanded.emit(this.item.id);
+    const item = this.item();
+    if (isFolder(item)) {
+      this.toggleExpanded.emit(item.id);
     }
   }
 
   onToggleSelected() {
-    const type = isFolder(this.item) ? 'folder' : 'item';
-    this.toggleSelected.emit({ id: this.item.id, type });
+    const item = this.item();
+    const type = isFolder(item) ? 'folder' : 'item';
+    this.toggleSelected.emit({ id: item.id, type });
   }
 }

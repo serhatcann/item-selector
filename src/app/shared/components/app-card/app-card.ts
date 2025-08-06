@@ -5,6 +5,4 @@ import { Component } from '@angular/core';
   imports: [],
   templateUrl: './app-card.html',
 })
-export class AppCard {
-
-}
+export class AppCard {}

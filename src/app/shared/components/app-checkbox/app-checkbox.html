@@ -1,24 +1,23 @@
 <div
   class="flex items-center justify-between hover:bg-hover cursor-default py-1 px-2"
-  [style.padding-left.px]="level * 20"
+  [style.padding-left.px]="level() * 20"
   (click)="onToggleSelected()"
 >
   <div class="flex gap-2 mx-2 items-center">
     <input
       type="checkbox"
-      [checked]="isFolder(item) ? item.selectedState === 'all' : item.selected"
-      [indeterminate]="isFolder(item) && item.selectedState === 'partial'"
-      (click)="$event.stopPropagation()"
-      (change)="onToggleSelected()"
+      [checked]="isChecked()"
+      [indeterminate]="isIndeterminate()"
+      (click)="onToggleSelected(); $event.stopPropagation()"
     />
-    <span [class.font-bold]="isFolder(item)">{{ item.title }}</span>
+    <span [class.font-bold]="isFolder(item())">{{ item().title }}</span>
   </div>
-  @if (isFolder(item)) {
+  @if (isFolder(item())) {
   <button
     (click)="onToggleExpanded(); $event.stopPropagation()"
     class="size-4 flex items-center justify-center text-text"
   >
-    {{ item.expanded ? "▲" : "▼" }}
+    {{ expandIcon() }}
   </button>
   }
 </div>

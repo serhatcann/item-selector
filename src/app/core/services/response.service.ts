@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Folder } from '../../shared/models/folder.model';
 import { Item } from '../../shared/models/item.model';
@@ -8,9 +8,8 @@ import { Observable, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ResponseService {
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = 'response.json';
-
-  constructor(private http: HttpClient) {}
 
   loadData(): Observable<(Folder | Item)[]> {
     return this.http.get<ApiResponse>(this.apiUrl).pipe(
@@ -58,7 +57,18 @@ export class ResponseService {
 
   private buildTree(folders: Folder[], items: Item[]): (Folder | Item)[] {
     const folderMap = new Map<number, Folder>();
-    folders.forEach((folder) => folderMap.set(folder.id, folder));
+    const rootFolders: Folder[] = [];
+    const childFolders: Folder[] = [];
+
+    // Build folder map, identify root folders and child folders
+    folders.forEach((folder) => {
+      folderMap.set(folder.id, folder);
+      if (!folder.parent_id) {
+        rootFolders.push(folder);
+      } else {
+        childFolders.push(folder);
+      }
+    });
 
     // Add items to their folders
     const orphanItems: Item[] = [];
@@ -71,18 +81,14 @@ export class ResponseService {
       }
     });
 
-    // Add folders to their parent folders
-    folders.forEach((folder) => {
-      if (folder.parent_id) {
-        const parentFolder = folderMap.get(folder.parent_id);
-        if (parentFolder) {
-          parentFolder.children?.push(folder);
-        }
+    // Add child folders to their parent folders
+    childFolders.forEach((folder) => {
+      const parentFolder = folderMap.get(folder.parent_id!);
+      if (parentFolder) {
+        parentFolder.children?.push(folder);
       }
     });
 
-    // Return root folders and orphan items
-    const rootFolders = folders.filter((folder) => !folder.parent_id);
     return [...rootFolders, ...orphanItems];
   }
 }

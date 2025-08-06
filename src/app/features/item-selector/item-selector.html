@@ -4,7 +4,7 @@
     <ng-container
       [ngTemplateOutlet]="itemTemplate"
       [ngTemplateOutletContext]="{ $implicit: item, level: 0 }"
-    ></ng-container>
+    />
     }
   </app-card>
   <div class="text-xs rounded flex gap-2 items-center">
@@ -13,10 +13,10 @@
   </div>
   <app-button
     class="self-end"
-    [disabled]="!selectedItemIds.length"
+    [disabled]="!selectedItemIds().length"
     (click)="clearSelection()"
-    >Clear Selection</app-button
-  >
+    >Clear Selection
+  </app-button>
 </div>
 
 <ng-template #itemTemplate let-item let-level="level">
@@ -25,13 +25,13 @@
     [level]="level"
     (toggleExpanded)="onToggleExpanded($event)"
     (toggleSelected)="onToggleSelected($event)"
-  >
-  </app-checkbox>
+  />
+
   @if (item.children && item.expanded) { @for (child of item.children; track
   child.id) {
   <ng-container
     [ngTemplateOutlet]="itemTemplate"
     [ngTemplateOutletContext]="{ $implicit: child, level: level + 1 }"
-  ></ng-container>
+  />
   } }
 </ng-template>

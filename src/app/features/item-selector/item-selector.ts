@@ -33,13 +33,13 @@ export class ItemSelector implements OnInit {
     items: (Folder | Item)[],
     selectedIds: number[]
   ): void {
-    items.forEach((item) => {
+    for (const item of items) {
       if (isItem(item) && item.selected) {
         selectedIds.push(item.id);
       } else if (isFolder(item) && item.children) {
         this.collectSelectedIds(item.children, selectedIds);
       }
-    });
+    }
   }
 
   clearSelection(): void {
@@ -49,7 +49,7 @@ export class ItemSelector implements OnInit {
   }
 
   private clearAllSelections(items: (Folder | Item)[]): void {
-    items.forEach((item) => {
+    for (const item of items) {
       if (isItem(item)) {
         item.selected = false;
       } else if (isFolder(item)) {
@@ -58,7 +58,7 @@ export class ItemSelector implements OnInit {
           this.clearAllSelections(item.children);
         }
       }
-    });
+    }
   }
 
   onToggleExpanded(folderId: number): void {

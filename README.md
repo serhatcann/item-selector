@@ -1,59 +1,80 @@
-# ItemSelector
+# Item Selector
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
+An Angular 20 application for item selection with folder/file tree structure.
 
-## Development server
+## Prerequisites
 
-To start a local development server, run:
+- **Node.js**: v22.14.0 or higher
+- **npm**: Latest version (comes with Node.js)
+- **Angular CLI**: v20.1.4 or higher (optional, for direct ng commands)
 
-```bash
-ng serve
+## Quick Start
+
+1. **Clone and navigate to the project:**
+
+   ```bash
+   cd item-selector
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start development server:**
+
+   ```bash
+   npm start
+   ```
+
+4. **Open your browser:**
+   Navigate to `http://localhost:4200/`
+
+## Available Scripts
+
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `npm start`     | Start development server |
+| `npm run build` | Build for production     |
+| `npm test`      | Run unit tests           |
+| `npm run watch` | Build in watch mode      |
+
+## Angular CLI Options
+
+If you have Angular CLI installed globally (`npm install -g @angular/cli`), you can use these commands directly:
+
+| Command | Description |
+|---------|-------------|
+| `ng serve` | Start development server |
+| `ng build` | Build for production |
+| `ng test` | Run unit tests |
+| `ng generate component <name>` | Generate new component |
+| `ng generate service <name>` | Generate new service |
+| `ng lint` | Run linting |
+| `ng serve --open` | Start server and open browser |
+| `ng build --watch` | Build in watch mode |
+
+## Technology Stack
+
+- **Angular**: 20.1.0
+- **TypeScript**: 5.8.2
+- **Tailwind CSS**: 4.1.11
+- **RxJS**: 7.8.0
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── core/           # Core services and utilities
+│   ├── features/       # Feature modules
+│   ├── shared/         # Shared components and models
+│   └── app.component.ts
+├── styles.css          # Global styles
+└── main.ts            # Application bootstrap
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Build
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Run `npm run build` to build the project. Build artifacts are stored in the `dist/` directory.

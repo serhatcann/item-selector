@@ -3,10 +3,10 @@ import { Folder } from '../../models/folder.model';
 import { Item } from '../../models/item.model';
 import { isFolder } from '../../utils/type-guards';
 
-type ToggleEvent = {
+interface ToggleEvent {
   id: number;
   type: 'folder' | 'item';
-};
+}
 
 @Component({
   selector: 'app-checkbox',

@@ -2,6 +2,8 @@
   class="flex items-center justify-between hover:bg-hover cursor-default py-1 px-2"
   [style.padding-left.px]="level() * 20"
   (click)="onToggleSelected()"
+  (keyup)="onToggleSelected()"
+  tabindex="0"
 >
   <div class="flex gap-2 mx-2 items-center">
     <input

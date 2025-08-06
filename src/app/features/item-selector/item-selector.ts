@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppCard } from '@/app/shared/components/app-card/app-card';
 import { AppCheckbox } from '@/app/shared/components/app-checkbox/app-checkbox';
@@ -14,25 +14,21 @@ import { AppButton } from '@/app/shared/components/app-button/app-button';
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
-  items: (Folder | Item)[] = [];
+  items = signal<(Folder | Item)[]>([]);
 
-  constructor(
-    private responseService: ResponseService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  constructor(private responseService: ResponseService) {}
 
   ngOnInit() {
     this.responseService.loadData().subscribe((items) => {
-      this.items = items;
-      this.cdr.detectChanges();
+      this.items.set(items);
     });
   }
 
-  get selectedItemIds(): number[] {
+  selectedItemIds = computed(() => {
     const selectedIds: number[] = [];
-    this.collectSelectedIds(this.items, selectedIds);
+    this.collectSelectedIds(this.items(), selectedIds);
     return selectedIds;
-  }
+  });
 
   private collectSelectedIds(
     items: (Folder | Item)[],
@@ -48,8 +44,9 @@ export class ItemSelector implements OnInit {
   }
 
   clearSelection(): void {
-    this.clearAllSelections(this.items);
-    this.cdr.detectChanges();
+    const currentItems = this.items();
+    this.clearAllSelections(currentItems);
+    this.items.set([...currentItems]);
   }
 
   private clearAllSelections(items: (Folder | Item)[]): void {
@@ -66,17 +63,20 @@ export class ItemSelector implements OnInit {
   }
 
   onToggleExpanded(folderId: number): void {
-    this.toggleFolderExpanded(this.items, folderId);
+    const currentItems = this.items();
+    this.toggleFolderExpanded(currentItems, folderId);
+    this.items.set([...currentItems]);
   }
 
   onToggleSelected(event: { id: number; type: 'folder' | 'item' }): void {
+    const currentItems = this.items();
     if (event.type === 'folder') {
-      this.toggleFolderSelection(this.items, event.id);
+      this.toggleFolderSelection(currentItems, event.id);
     } else {
-      this.toggleItemSelection(this.items, event.id);
+      this.toggleItemSelection(currentItems, event.id);
     }
-    this.updateParentStates(this.items);
-    this.cdr.detectChanges();
+    this.updateParentStates(currentItems);
+    this.items.set([...currentItems]);
   }
 
   private toggleFolderExpanded(

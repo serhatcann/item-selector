@@ -6,10 +6,11 @@ import { ResponseService } from '@/app/core/services/response.service';
 import { Folder } from '@/app/shared/models/folder.model';
 import { Item } from '@/app/shared/models/item.model';
 import { isFolder, isItem } from '@/app/shared/utils/type-guards';
+import { AppButton } from '@/app/shared/components/app-button/app-button';
 
 @Component({
   selector: 'item-selector',
-  imports: [CommonModule, AppCard, AppCheckbox],
+  imports: [CommonModule, AppCard, AppCheckbox, AppButton],
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
@@ -24,6 +25,43 @@ export class ItemSelector implements OnInit {
     this.responseService.loadData().subscribe((items) => {
       this.items = items;
       this.cdr.detectChanges();
+    });
+  }
+
+  get selectedItemIds(): number[] {
+    const selectedIds: number[] = [];
+    this.collectSelectedIds(this.items, selectedIds);
+    return selectedIds;
+  }
+
+  private collectSelectedIds(
+    items: (Folder | Item)[],
+    selectedIds: number[]
+  ): void {
+    items.forEach((item) => {
+      if (isItem(item) && item.selected) {
+        selectedIds.push(item.id);
+      } else if (isFolder(item) && item.children) {
+        this.collectSelectedIds(item.children, selectedIds);
+      }
+    });
+  }
+
+  clearSelection(): void {
+    this.clearAllSelections(this.items);
+    this.cdr.detectChanges();
+  }
+
+  private clearAllSelections(items: (Folder | Item)[]): void {
+    items.forEach((item) => {
+      if (isItem(item)) {
+        item.selected = false;
+      } else if (isFolder(item)) {
+        item.selectedState = 'none';
+        if (item.children) {
+          this.clearAllSelections(item.children);
+        }
+      }
     });
   }
 

@@ -13,7 +13,7 @@ import { isFolder, isItem } from '@/app/shared/utils/type-guards';
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
-  items: Folder[] = [];
+  items: (Folder | Item)[] = [];
 
   constructor(
     private responseService: ResponseService,
@@ -21,37 +21,10 @@ export class ItemSelector implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.responseService.loadData().subscribe(({ folders, items }) => {
-      this.items = this.buildTree(folders, items);
-      console.log('Items after populated:', this.items);
+    this.responseService.loadData().subscribe((items) => {
+      this.items = items;
       this.cdr.detectChanges();
     });
-  }
-
-  private buildTree(folders: Folder[], items: Item[]): Folder[] {
-    const folderMap = new Map<number, Folder>();
-    folders.forEach((folder) => {
-      folder.children = [];
-      folderMap.set(folder.id, folder);
-    });
-
-    items.forEach((item) => {
-      const folder = folderMap.get(item.folder_id);
-      if (folder?.children) {
-        folder.children.push(item);
-      }
-    });
-
-    folders.forEach((folder) => {
-      if (folder.parent_id) {
-        const parent = folderMap.get(folder.parent_id);
-        if (parent?.children) {
-          parent.children.push(folder);
-        }
-      }
-    });
-
-    return folders.filter((folder) => !folder.parent_id);
   }
 
   onToggleExpanded(folderId: number): void {

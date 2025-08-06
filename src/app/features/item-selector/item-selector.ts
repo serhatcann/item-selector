@@ -62,32 +62,41 @@ export class ItemSelector implements OnInit {
   }
 
   onToggleExpanded(folderId: number): void {
-    const currentItems = this.items();
-    this.toggleFolderExpanded(currentItems, folderId);
-    this.items.set([...currentItems]);
-  }
-
-  onToggleSelected(event: { id: number; type: 'folder' | 'item' }): void {
-    const currentItems = this.items();
-    if (event.type === 'folder') {
-      this.toggleFolderSelection(currentItems, event.id);
-    } else {
-      this.toggleItemSelection(currentItems, event.id);
-    }
-    this.updateParentStates(currentItems);
-    this.items.set([...currentItems]);
+    this.items.update((items) => {
+      this.toggleFolderExpanded(items, folderId);
+      return items;
+    });
   }
 
   private toggleFolderExpanded(
     items: (Folder | Item)[],
     folderId: number
   ): boolean {
-    return this.findAndUpdate(items, folderId, (item) => {
-      if (isFolder(item)) {
+    for (const item of items) {
+      if (item.id === folderId && isFolder(item)) {
         item.expanded = !item.expanded;
         return true;
       }
-      return false;
+      if (
+        isFolder(item) &&
+        item.children &&
+        this.toggleFolderExpanded(item.children, folderId)
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  onToggleSelected(event: { id: number; type: 'folder' | 'item' }): void {
+    this.items.update((items) => {
+      if (event.type === 'folder') {
+        this.toggleFolderSelection(items, event.id);
+      } else {
+        this.toggleItemSelection(items, event.id);
+      }
+      this.updateParentStates(items);
+      return [...items];
     });
   }
 
@@ -145,25 +154,30 @@ export class ItemSelector implements OnInit {
 
   private updateParentStates(items: (Folder | Item)[]): void {
     items.forEach((item) => {
-      if (isFolder(item) && item.children) {
+      if (isFolder(item) && item.children?.length) {
         this.updateParentStates(item.children);
 
-        const childItems = item.children.filter(isItem);
-        const childFolders = item.children.filter(isFolder);
+        let allSelected = true;
+        let someSelected = false;
 
-        const allSelected =
-          childItems.every((child) => child.selected) &&
-          childFolders.every((child) => child.selectedState === 'all');
-        const someSelected =
-          childItems.some((child) => child.selected) ||
-          childFolders.some((child) => child.selectedState !== 'none');
+        for (const child of item.children) {
+          if (isItem(child)) {
+            if (child.selected) someSelected = true;
+            else allSelected = false;
+          } else if (isFolder(child)) {
+            if (child.selectedState === 'all') someSelected = true;
+            else if (child.selectedState === 'partial') {
+              someSelected = true;
+              allSelected = false;
+            } else allSelected = false;
+          }
+        }
 
-        item.selectedState =
-          allSelected && item.children.length > 0
-            ? 'all'
-            : someSelected
-            ? 'partial'
-            : 'none';
+        item.selectedState = allSelected
+          ? 'all'
+          : someSelected
+          ? 'partial'
+          : 'none';
       }
     });
   }

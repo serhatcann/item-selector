@@ -8,7 +8,7 @@ import { Observable, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ResponseService {
-  private readonly apiUrl = '/assets/response.json';
+  private readonly apiUrl = 'response.json';
 
   constructor(private http: HttpClient) {}
 

@@ -12,7 +12,7 @@ import { Item } from '@/app/shared/models/item.model';
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
-  treeData: (Folder | Item)[] = [];
+  items: (Folder | Item)[] = [];
 
   constructor(
     private responseService: ResponseService,
@@ -21,7 +21,7 @@ export class ItemSelector implements OnInit {
 
   ngOnInit() {
     this.responseService.loadData().subscribe(({ folders, items }) => {
-      this.treeData = this.buildTree(folders, items);
+      this.items = this.buildTree(folders, items);
       this.cdr.detectChanges();
     });
   }
@@ -53,16 +53,16 @@ export class ItemSelector implements OnInit {
   }
 
   onToggleExpanded(folderId: number) {
-    this.toggleFolderExpanded(this.treeData, folderId);
+    this.toggleFolderExpanded(this.items, folderId);
   }
 
   onToggleSelected(event: { id: number; type: 'folder' | 'item' }) {
     if (event.type === 'folder') {
-      this.toggleFolderSelection(this.treeData, event.id);
+      this.toggleFolderSelection(this.items, event.id);
     } else {
-      this.toggleItemSelection(this.treeData, event.id);
-      this.updateParentStates(this.treeData);
+      this.toggleItemSelection(this.items, event.id);
     }
+    this.updateParentStates(this.items);
     this.cdr.detectChanges();
   }
 
@@ -70,54 +70,54 @@ export class ItemSelector implements OnInit {
     items: (Folder | Item)[],
     folderId: number
   ): boolean {
-    for (const item of items) {
+    return this.findAndUpdate(items, folderId, (item) => {
       if ('children' in item) {
-        if (item.id === folderId) {
-          item.expanded = !item.expanded;
-          return true;
-        }
-        if (this.toggleFolderExpanded(item.children || [], folderId)) {
-          return true;
-        }
+        item.expanded = !item.expanded;
+        return true;
       }
-    }
-    return false;
+      return false;
+    });
   }
 
   private toggleFolderSelection(
     items: (Folder | Item)[],
     folderId: number
   ): boolean {
-    for (const item of items) {
+    return this.findAndUpdate(items, folderId, (item) => {
       if ('children' in item) {
-        if (item.id === folderId) {
-          const newState = item.selectedState === 'all' ? 'none' : 'all';
-          this.setFolderSelectionState(item, newState);
-          return true;
-        }
-        if (this.toggleFolderSelection(item.children || [], folderId)) {
-          return true;
-        }
+        const newState = item.selectedState === 'all' ? 'none' : 'all';
+        this.setFolderSelectionState(item, newState);
+        return true;
       }
-    }
-    return false;
+      return false;
+    });
   }
 
   private toggleItemSelection(
     items: (Folder | Item)[],
     itemId: number
   ): boolean {
-    for (const item of items) {
-      if ('selected' in item && item.id === itemId) {
+    return this.findAndUpdate(items, itemId, (item) => {
+      if ('selected' in item) {
         item.selected = !item.selected;
         return true;
       }
+      return false;
+    });
+  }
+
+  private findAndUpdate(
+    items: (Folder | Item)[],
+    id: number,
+    updateFn: (item: Folder | Item) => boolean
+  ): boolean {
+    for (const item of items) {
+      if (item.id === id && updateFn(item)) return true;
       if (
         'children' in item &&
-        this.toggleItemSelection(item.children || [], itemId)
-      ) {
+        this.findAndUpdate(item.children || [], id, updateFn)
+      )
         return true;
-      }
     }
     return false;
   }
@@ -134,25 +134,30 @@ export class ItemSelector implements OnInit {
   }
 
   private updateParentStates(items: (Folder | Item)[]): void {
-    items.forEach(item => {
+    items.forEach((item) => {
       if ('children' in item && item.children) {
         this.updateParentStates(item.children);
-        
-        const childItems = item.children.filter(child => 'selected' in child) as Item[];
-        const childFolders = item.children.filter(child => 'children' in child) as Folder[];
-        
-        const allItemsSelected = childItems.every(child => child.selected);
-        const allFoldersSelected = childFolders.every(child => child.selectedState === 'all');
-        const someItemsSelected = childItems.some(child => child.selected);
-        const someFoldersSelected = childFolders.some(child => child.selectedState === 'all' || child.selectedState === 'partial');
-        
-        if (allItemsSelected && allFoldersSelected && childItems.length + childFolders.length > 0) {
-          item.selectedState = 'all';
-        } else if (someItemsSelected || someFoldersSelected) {
-          item.selectedState = 'partial';
-        } else {
-          item.selectedState = 'none';
-        }
+
+        const childItems = item.children.filter(
+          (child) => 'selected' in child
+        ) as Item[];
+        const childFolders = item.children.filter(
+          (child) => 'children' in child
+        ) as Folder[];
+
+        const allSelected =
+          childItems.every((child) => child.selected) &&
+          childFolders.every((child) => child.selectedState === 'all');
+        const someSelected =
+          childItems.some((child) => child.selected) ||
+          childFolders.some((child) => child.selectedState !== 'none');
+
+        item.selectedState =
+          allSelected && item.children.length > 0
+            ? 'all'
+            : someSelected
+            ? 'partial'
+            : 'none';
       }
     });
   }

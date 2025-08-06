@@ -19,6 +19,7 @@ export class AppCheckbox {
   @Output() toggleExpanded = new EventEmitter<number>();
   @Output() toggleSelected = new EventEmitter<ToggleEvent>();
 
+  // if the item type is Folder then narrow the item type to Folder
   isFolder(item: Folder | Item): item is Folder {
     return 'children' in item;
   }

@@ -1,10 +1,25 @@
 <app-card>
-  @for (item of treeData; track item.id) {
+  @for (item of items; track item.id) {
+  <ng-container
+    [ngTemplateOutlet]="itemTemplate"
+    [ngTemplateOutletContext]="{ $implicit: item, level: 0 }"
+  ></ng-container>
+  }
+</app-card>
+
+<ng-template #itemTemplate let-item let-level="level">
   <app-checkbox
     [item]="item"
+    [level]="level"
     (toggleExpanded)="onToggleExpanded($event)"
     (toggleSelected)="onToggleSelected($event)"
   >
   </app-checkbox>
-  }
-</app-card>
+  @if (item.children && item.expanded) { @for (child of item.children; track
+  child.id) {
+  <ng-container
+    [ngTemplateOutlet]="itemTemplate"
+    [ngTemplateOutletContext]="{ $implicit: child, level: level + 1 }"
+  ></ng-container>
+  } }
+</ng-template>

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppCard } from '@/app/shared/components/app-card/app-card';
 import { AppCheckbox } from '@/app/shared/components/app-checkbox/app-checkbox';
@@ -15,20 +15,19 @@ import { AppButton } from '@/app/shared/components/app-button/app-button';
 })
 export class ItemSelector implements OnInit {
   items = signal<(Folder | Item)[]>([]);
+  selectedItemIds = computed(() => {
+    const selectedIds: number[] = [];
+    this.collectSelectedIds(this.items(), selectedIds);
+    return selectedIds;
+  });
 
-  constructor(private responseService: ResponseService) {}
+  private responseService = inject(ResponseService);
 
   ngOnInit() {
     this.responseService.loadData().subscribe((items) => {
       this.items.set(items);
     });
   }
-
-  selectedItemIds = computed(() => {
-    const selectedIds: number[] = [];
-    this.collectSelectedIds(this.items(), selectedIds);
-    return selectedIds;
-  });
 
   private collectSelectedIds(
     items: (Folder | Item)[],

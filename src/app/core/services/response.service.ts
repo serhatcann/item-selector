@@ -26,20 +26,26 @@ export class ResponseService {
     folders: Folder[];
     items: Item[];
   } {
-    const folders: Folder[] = response.folders.data.map((row) => ({
-      id: row[0],
-      title: row[1],
-      parent_id: row[2],
-      expanded: true,
-      selectedState: 'none',
-    }));
+    const folders: Folder[] = response.folders.data
+      .map(
+        (row): Folder => ({
+          id: row[0],
+          title: row[1],
+          parent_id: row[2],
+          expanded: true,
+          selectedState: 'none',
+        })
+      )
+      .sort((a, b) => a.title.localeCompare(b.title));
 
-    const items: Item[] = response.items.data.map((row) => ({
-      id: row[0],
-      title: row[1],
-      folder_id: row[2],
-      selected: false,
-    }));
+    const items: Item[] = response.items.data
+      .map((row) => ({
+        id: row[0],
+        title: row[1],
+        folder_id: row[2],
+        selected: false,
+      }))
+      .sort((a, b) => a.title.localeCompare(b.title));
 
     return { folders, items };
   }

@@ -5,6 +5,7 @@ import { AppCheckbox } from '@/app/shared/components/app-checkbox/app-checkbox';
 import { ResponseService } from '@/app/core/services/response.service';
 import { Folder } from '@/app/shared/models/folder.model';
 import { Item } from '@/app/shared/models/item.model';
+import { isFolder, isItem } from '@/app/shared/utils/type-guards';
 
 @Component({
   selector: 'item-selector',
@@ -12,7 +13,7 @@ import { Item } from '@/app/shared/models/item.model';
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
-  items: (Folder | Item)[] = [];
+  items: Folder[] = [];
 
   constructor(
     private responseService: ResponseService,
@@ -22,11 +23,12 @@ export class ItemSelector implements OnInit {
   ngOnInit() {
     this.responseService.loadData().subscribe(({ folders, items }) => {
       this.items = this.buildTree(folders, items);
+      console.log('Items after populated:', this.items);
       this.cdr.detectChanges();
     });
   }
 
-  private buildTree(folders: Folder[], items: Item[]): (Folder | Item)[] {
+  private buildTree(folders: Folder[], items: Item[]): Folder[] {
     const folderMap = new Map<number, Folder>();
     folders.forEach((folder) => {
       folder.children = [];
@@ -35,16 +37,16 @@ export class ItemSelector implements OnInit {
 
     items.forEach((item) => {
       const folder = folderMap.get(item.folder_id);
-      if (folder) {
-        folder.children!.push(item);
+      if (folder?.children) {
+        folder.children.push(item);
       }
     });
 
     folders.forEach((folder) => {
       if (folder.parent_id) {
         const parent = folderMap.get(folder.parent_id);
-        if (parent) {
-          parent.children!.push(folder);
+        if (parent?.children) {
+          parent.children.push(folder);
         }
       }
     });
@@ -52,11 +54,11 @@ export class ItemSelector implements OnInit {
     return folders.filter((folder) => !folder.parent_id);
   }
 
-  onToggleExpanded(folderId: number) {
+  onToggleExpanded(folderId: number): void {
     this.toggleFolderExpanded(this.items, folderId);
   }
 
-  onToggleSelected(event: { id: number; type: 'folder' | 'item' }) {
+  onToggleSelected(event: { id: number; type: 'folder' | 'item' }): void {
     if (event.type === 'folder') {
       this.toggleFolderSelection(this.items, event.id);
     } else {
@@ -71,7 +73,7 @@ export class ItemSelector implements OnInit {
     folderId: number
   ): boolean {
     return this.findAndUpdate(items, folderId, (item) => {
-      if ('children' in item) {
+      if (isFolder(item)) {
         item.expanded = !item.expanded;
         return true;
       }
@@ -84,7 +86,7 @@ export class ItemSelector implements OnInit {
     folderId: number
   ): boolean {
     return this.findAndUpdate(items, folderId, (item) => {
-      if ('children' in item) {
+      if (isFolder(item)) {
         const newState = item.selectedState === 'all' ? 'none' : 'all';
         this.setFolderSelectionState(item, newState);
         return true;
@@ -98,7 +100,7 @@ export class ItemSelector implements OnInit {
     itemId: number
   ): boolean {
     return this.findAndUpdate(items, itemId, (item) => {
-      if ('selected' in item) {
+      if (isItem(item)) {
         item.selected = !item.selected;
         return true;
       }
@@ -113,21 +115,19 @@ export class ItemSelector implements OnInit {
   ): boolean {
     for (const item of items) {
       if (item.id === id && updateFn(item)) return true;
-      if (
-        'children' in item &&
-        this.findAndUpdate(item.children || [], id, updateFn)
-      )
-        return true;
+      if (isFolder(item) && item.children) {
+        if (this.findAndUpdate(item.children, id, updateFn)) return true;
+      }
     }
     return false;
   }
 
-  private setFolderSelectionState(folder: Folder, state: 'none' | 'all') {
+  private setFolderSelectionState(folder: Folder, state: 'none' | 'all'): void {
     folder.selectedState = state;
     folder.children?.forEach((child) => {
-      if ('selected' in child) {
+      if (isItem(child)) {
         child.selected = state === 'all';
-      } else {
+      } else if (isFolder(child)) {
         this.setFolderSelectionState(child, state);
       }
     });
@@ -135,15 +135,11 @@ export class ItemSelector implements OnInit {
 
   private updateParentStates(items: (Folder | Item)[]): void {
     items.forEach((item) => {
-      if ('children' in item && item.children) {
+      if (isFolder(item) && item.children) {
         this.updateParentStates(item.children);
 
-        const childItems = item.children.filter(
-          (child) => 'selected' in child
-        ) as Item[];
-        const childFolders = item.children.filter(
-          (child) => 'children' in child
-        ) as Folder[];
+        const childItems = item.children.filter(isItem);
+        const childFolders = item.children.filter(isFolder);
 
         const allSelected =
           childItems.every((child) => child.selected) &&

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Folder } from '../../models/folder.model';
 import { Item } from '../../models/item.model';
+import { isFolder } from '../../utils/type-guards';
 
 type ToggleEvent = {
   id: number;
@@ -19,19 +20,16 @@ export class AppCheckbox {
   @Output() toggleExpanded = new EventEmitter<number>();
   @Output() toggleSelected = new EventEmitter<ToggleEvent>();
 
-  // if the item type is Folder then narrow the item type to Folder
-  isFolder(item: Folder | Item): item is Folder {
-    return 'children' in item;
-  }
+  isFolder = isFolder;
 
   onToggleExpanded() {
-    if (this.isFolder(this.item)) {
+    if (isFolder(this.item)) {
       this.toggleExpanded.emit(this.item.id);
     }
   }
 
   onToggleSelected() {
-    const type = this.isFolder(this.item) ? 'folder' : 'item';
+    const type = isFolder(this.item) ? 'folder' : 'item';
     this.toggleSelected.emit({ id: this.item.id, type });
   }
 }

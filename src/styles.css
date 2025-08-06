@@ -1,1 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+@theme {
+  --color-surface: hsl(0, 0%, 100%);
+  --color-hover: hsl(0, 0%, 96%);
+  --color-text: hsl(195, 3%, 24%);
+  --color-border: hsl(210, 0%, 89%);
+  --color-primary: hsl(213, 97%, 53%);
+
+  --radius: 3px;
+}

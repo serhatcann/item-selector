@@ -1,15 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AppCard } from './shared/components/app-card/app-card';
-import { AppButton } from './shared/components/app-button/app-button';
+import { ItemSelector } from '@/app/features/item-selector/item-selector';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, AppCard, AppButton],
+  imports: [RouterOutlet, ItemSelector],
   templateUrl: './app.html',
 })
-export class App {
-  onClick() {
-    console.log('click');
-  }
-}
+export class App {}

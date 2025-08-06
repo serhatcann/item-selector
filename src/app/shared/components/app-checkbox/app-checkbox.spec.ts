@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AppCard } from './app-card';
+import { AppCheckbox } from './app-checkbox';
 
-describe('AppCard', () => {
-  let component: AppCard;
-  let fixture: ComponentFixture<AppCard>;
+describe('AppCheckbox', () => {
+  let component: AppCheckbox;
+  let fixture: ComponentFixture<AppCheckbox>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppCard],
+      imports: [AppCheckbox],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AppCard);
+    fixture = TestBed.createComponent(AppCheckbox);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

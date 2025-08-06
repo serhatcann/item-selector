@@ -1,0 +1,10 @@
+<app-card>
+  @for (item of treeData; track item.id) {
+  <app-checkbox
+    [item]="item"
+    (toggleExpanded)="onToggleExpanded($event)"
+    (toggleSelected)="onToggleSelected($event)"
+  >
+  </app-checkbox>
+  }
+</app-card>

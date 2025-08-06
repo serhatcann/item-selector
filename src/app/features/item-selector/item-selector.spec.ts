@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AppCard } from './app-card';
+import { ItemSelector } from './item-selector';
 
-describe('AppCard', () => {
-  let component: AppCard;
-  let fixture: ComponentFixture<AppCard>;
+describe('ItemSelector', () => {
+  let component: ItemSelector;
+  let fixture: ComponentFixture<ItemSelector>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppCard],
+      imports: [ItemSelector],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AppCard);
+    fixture = TestBed.createComponent(ItemSelector);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

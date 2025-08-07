@@ -7,15 +7,18 @@
     />
     }
   </app-card>
-  <div class="text-xs rounded flex gap-2 items-center">
+
+  <div class="text-xs flex gap-2 items-center">
     <span>Selected item IDs:</span>
     {{ selectedItemIds().join(", ") || "None" }}
   </div>
+
   <app-button
     class="self-end"
     [disabled]="!selectedItemIds().length"
     (click)="clearSelection()"
-    >Clear Selection
+  >
+    Clear Selection
   </app-button>
 </div>
 

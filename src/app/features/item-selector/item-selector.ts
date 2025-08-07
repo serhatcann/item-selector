@@ -63,29 +63,12 @@ export class ItemSelector implements OnInit {
 
   onToggleExpanded(folderId: number): void {
     this.items.update((items) => {
-      this.toggleFolderExpanded(items, folderId);
+      const folder = this.findFolder(items, folderId);
+      if (folder) {
+        folder.expanded = !folder.expanded;
+      }
       return items;
     });
-  }
-
-  private toggleFolderExpanded(
-    items: (Folder | Item)[],
-    folderId: number
-  ): boolean {
-    for (const item of items) {
-      if (item.id === folderId && isFolder(item)) {
-        item.expanded = !item.expanded;
-        return true;
-      }
-      if (
-        isFolder(item) &&
-        item.children &&
-        this.toggleFolderExpanded(item.children, folderId)
-      ) {
-        return true;
-      }
-    }
-    return false;
   }
 
   onToggleSelected(event: { id: number; type: 'folder' | 'item' }): void {
@@ -103,42 +86,41 @@ export class ItemSelector implements OnInit {
   private toggleFolderSelection(
     items: (Folder | Item)[],
     folderId: number
-  ): boolean {
-    return this.findAndUpdate(items, folderId, (item) => {
-      if (isFolder(item)) {
-        const newState = item.selectedState === 'all' ? 'none' : 'all';
-        this.setFolderSelectionState(item, newState);
-        return true;
-      }
-      return false;
-    });
+  ): void {
+    const folder = this.findFolder(items, folderId);
+    if (folder) {
+      const newState = folder.selectedState === 'all' ? 'none' : 'all';
+      this.setFolderSelectionState(folder, newState);
+    }
   }
 
-  private toggleItemSelection(
-    items: (Folder | Item)[],
-    itemId: number
-  ): boolean {
-    return this.findAndUpdate(items, itemId, (item) => {
-      if (isItem(item)) {
-        item.selected = !item.selected;
-        return true;
-      }
-      return false;
-    });
+  private toggleItemSelection(items: (Folder | Item)[], itemId: number): void {
+    const item = this.findItem(items, itemId);
+    if (item) {
+      item.selected = !item.selected;
+    }
   }
 
-  private findAndUpdate(
-    items: (Folder | Item)[],
-    id: number,
-    updateFn: (item: Folder | Item) => boolean
-  ): boolean {
+  private findFolder(items: (Folder | Item)[], id: number): Folder | null {
     for (const item of items) {
-      if (item.id === id && updateFn(item)) return true;
+      if (item.id === id && isFolder(item)) return item;
       if (isFolder(item) && item.children) {
-        if (this.findAndUpdate(item.children, id, updateFn)) return true;
+        const found = this.findFolder(item.children, id);
+        if (found) return found;
       }
     }
-    return false;
+    return null;
+  }
+
+  private findItem(items: (Folder | Item)[], id: number): Item | null {
+    for (const item of items) {
+      if (item.id === id && isItem(item)) return item;
+      if (isFolder(item) && item.children) {
+        const found = this.findItem(item.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
   }
 
   private setFolderSelectionState(folder: Folder, state: 'none' | 'all'): void {

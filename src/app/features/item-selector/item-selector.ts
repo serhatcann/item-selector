@@ -156,29 +156,34 @@ export class ItemSelector implements OnInit {
     items.forEach((item) => {
       if (isFolder(item) && item.children?.length) {
         this.updateParentStates(item.children);
-
-        let allSelected = true;
-        let someSelected = false;
-
-        for (const child of item.children) {
-          if (isItem(child)) {
-            if (child.selected) someSelected = true;
-            else allSelected = false;
-          } else if (isFolder(child)) {
-            if (child.selectedState === 'all') someSelected = true;
-            else if (child.selectedState === 'partial') {
-              someSelected = true;
-              allSelected = false;
-            } else allSelected = false;
-          }
-        }
-
-        item.selectedState = allSelected
-          ? 'all'
-          : someSelected
-          ? 'partial'
-          : 'none';
+        this.updateFolderState(item);
       }
     });
+  }
+
+  private updateFolderState(folder: Folder): void {
+    if (!folder.children?.length) return;
+
+    let allSelected = true;
+    let someSelected = false;
+
+    for (const child of folder.children) {
+      if (isItem(child)) {
+        if (child.selected) someSelected = true;
+        else allSelected = false;
+      } else if (isFolder(child)) {
+        if (child.selectedState === 'all') someSelected = true;
+        else if (child.selectedState === 'partial') {
+          someSelected = true;
+          allSelected = false;
+        } else allSelected = false;
+      }
+    }
+
+    folder.selectedState = allSelected
+      ? 'all'
+      : someSelected
+      ? 'partial'
+      : 'none';
   }
 }

@@ -70,7 +70,7 @@ src/
 │   ├── core/           # Core services and utilities
 │   ├── features/       # Feature modules
 │   ├── shared/         # Shared components and models
-│   └── app.component.ts
+│   └── app.ts
 ├── styles.css          # Global styles
 └── main.ts            # Application bootstrap
 ```

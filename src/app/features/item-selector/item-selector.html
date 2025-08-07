@@ -8,18 +8,13 @@
     }
   </app-card>
 
-  <div class="text-xs flex gap-2 items-center">
-    <span>Selected item IDs:</span>
-    {{ selectedItemIds().join(", ") || "None" }}
-  </div>
+  <selected-items-list [selectedIds]="selectedItemIds()" />
 
-  <app-button
+  <clear-selection
     class="self-end"
-    [disabled]="!selectedItemIds().length"
-    (click)="clearSelection()"
-  >
-    Clear Selection
-  </app-button>
+    [hasSelection]="!!selectedItemIds().length"
+    (clearSelection)="clearSelection()"
+  />
 </div>
 
 <ng-template #itemTemplate let-item let-level="level">

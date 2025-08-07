@@ -6,11 +6,18 @@ import { ResponseService } from '@/app/core/services/response.service';
 import { Folder } from '@/app/shared/models/folder.model';
 import { Item } from '@/app/shared/models/item.model';
 import { isFolder, isItem } from '@/app/shared/utils/type-guards';
-import { AppButton } from '@/app/shared/components/app-button/app-button';
+import { SelectedItemsList } from './selected-items-list/selected-items-list';
+import { ClearSelection } from './clear-selection/clear-selection';
 
 @Component({
   selector: 'item-selector',
-  imports: [CommonModule, AppCard, AppCheckbox, AppButton],
+  imports: [
+    CommonModule,
+    AppCard,
+    AppCheckbox,
+    SelectedItemsList,
+    ClearSelection,
+  ],
   templateUrl: './item-selector.html',
 })
 export class ItemSelector implements OnInit {
